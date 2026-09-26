@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Gaurav Pokhrel </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #08090c;
+      --dial: rgba(20, 20, 24, .88);
+      --ring: #1f1f1f;
+      --hole: #1a1a1a;
+      --ivory: #efece4;
+      --dim: #6f6f6a;
+      --line: #2a2a2a;
+      --signal: #e8452c;
+      --radius: 210px;
+      --hole-size: 96px;
+      --hub: 230px;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background: var(--bg);
+      scroll-snap-type: y proximity;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 18% 20%, rgba(232, 69, 44, .12), transparent 30%),
+        radial-gradient(circle at 82% 28%, rgba(83, 88, 255, .10), transparent 30%),
+        radial-gradient(circle at 50% 82%, rgba(255, 255, 255, .045), transparent 28%),
+        linear-gradient(135deg, #07080b 0%, #0b0c10 42%, #08090c 100%);
+      color: var(--ivory);
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      isolation: isolate;
+    }
+
+    /* subtle technical grid + atmospheric glow */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    body::before {
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: radial-gradient(circle at center, black 25%, transparent 85%);
+      -webkit-mask-image: radial-gradient(circle at center, black 25%, transparent 85%);
+    }
+
+    body::after {
+      background:
+        radial-gradient(ellipse at 50% 45%, transparent 0 30%, rgba(0, 0, 0, .18) 70%, rgba(0, 0, 0, .5) 100%);
+    }
+
+    .hero,
+    .story {
+      position: relative;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(232, 69, 44, .10), transparent 68%);
+      filter: blur(8px);
+      animation: ambientPulse 7s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .story::before {
+      content: "";
+      position: absolute;
+      width: 680px;
+      height: 680px;
+      left: 50%;
+      top: 18%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(110, 120, 255, .055), transparent 68%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes ambientPulse {
+      0%, 100% { transform: scale(.92); opacity: .65; }
+      50% { transform: scale(1.08); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+      }
+    }
+
+    .hero {
+      min-height: 100vh;
+      scroll-snap-align: start;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .scene {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 36px;
+    }
+
+    /* horizontal guide lines, like a phone slotted in a housing */
+    .guide {
+      position: absolute;
+      top: 50%;
+      height: 1px;
+      width: 22vw;
+      background: var(--line);
+      z-index: 0;
+    }
+
+    .guide.left {
+      left: 0;
+    }
+
+    .guide.right {
+      right: 0;
+    }
+
+    .dial-wrap {
+      position: relative;
+      width: calc(var(--radius)*2 + var(--hole-size));
+      height: calc(var(--radius)*2 + var(--hole-size));
+    }
+
+    .outer-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, .10);
+      box-shadow:
+        0 0 90px rgba(232, 69, 44, .045),
+        inset 0 0 45px rgba(255, 255, 255, .025);
+    }
+
+    .dial {
+      position: absolute;
+      inset: 0;
+      transition: transform 900ms cubic-bezier(.65, 0, .35, 1);
+    }
+
+    .hole {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--hole-size);
+      height: var(--hole-size);
+      margin: calc(var(--hole-size)/-2) 0 0 calc(var(--hole-size)/-2);
+      transform: rotate(calc(90deg*var(--i))) translate(0, calc(var(--radius)*-1)) rotate(calc(-90deg*var(--i)));
+      border-radius: 50%;
+      background: var(--hole);
+      border: 1px solid var(--line);
+      color: var(--ivory);
+      font-family: inherit;
+      font-size: 13px;
+      letter-spacing: .02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0;
+      animation: pop .5s ease forwards;
+      animation-delay: calc(var(--i)*90ms + .2s);
+      transition: background 250ms, border-color 250ms, transform 900ms cubic-bezier(.65, 0, .35, 1);
+    }
+
+    .hole:hover,
+    .hole:focus-visible {
+      background: #1f1f1f;
+      border-color: var(--signal);
+      outline: none;
+    }
+
+    .hole.selected {
+      border-color: var(--signal);
+      color: var(--signal);
+    }
+
+    @keyframes pop {
+      from {
+        opacity: 0;
+        transform: rotate(calc(90deg*var(--i))) translate(0, calc(var(--radius)*-1)) rotate(calc(-90deg*var(--i))) scale(.4);
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* finger stopper, fixed — does not rotate */
+    .stopper {
+      position: absolute;
+      width: 34px;
+      height: 70px;
+      right: -6px;
+      bottom: 56px;
+      background: var(--ivory);
+      clip-path: polygon(0 0, 100% 30%, 70% 100%, 20% 70%);
+      opacity: .9;
+    }
+
+    .hub {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--hub);
+      height: var(--hub);
+      margin: calc(var(--hub)/-2) 0 0 calc(var(--hub)/-2);
+      border-radius: 50%;
+      background: #000;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 900ms cubic-bezier(.65, 0, .35, 1), filter 600ms;
+    }
+
+    .hub img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hub .placeholder {
+      color: var(--dim);
+      font-size: 12px;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .name {
+      font-size: 14px;
+      letter-spacing: .06em;
+      color: var(--dim);
+    }
+
+    .name b {
+      color: var(--ivory);
+      font-weight: 500;
+    }
+
+    /* dial "dialing" state: recede + dim while a section is open */
+    .scene.open .dial-wrap {
+      transform: scale(.72);
+      transition: transform 700ms cubic-bezier(.65, 0, .35, 1);
+    }
+
+    .scene.open .name {
+      opacity: 0;
+      transition: opacity 300ms;
+    }
+
+    /* content panel */
+    .panel {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel-sheet {
+      width: min(640px, 92vw);
+      max-height: 82vh;
+      overflow-y: auto;
+      background: var(--dial);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 48px 44px;
+      transform: translateY(24px) scale(.97);
+      opacity: 0;
+      transition: transform 500ms cubic-bezier(.2, .8, .2, 1), opacity 400ms;
+      pointer-events: auto;
+    }
+
+    .panel.active .panel-sheet {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .panel-sheet h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .panel-sheet .body {
+      color: #bdbab2;
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 60ch;
+    }
+
+    .panel section {
+      display: none;
+    }
+
+    .panel section.current {
+      display: block;
+    }
+
+    .close {
+      position: absolute;
+      top: 28px;
+      right: 32px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ivory);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close:hover {
+      border-color: var(--signal);
+      color: var(--signal);
+    }
+
+    /* Skills layout: left = Design + Front-end, right = Platforms/CMS + Practice */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 42px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .skills-column {
+      min-width: 0;
+    }
+
+    .skill-group {
+      margin-bottom: 32px;
+    }
+
+    .skill-group h4 {
+      font-size: 15px;
+      color: var(--dim);
+      margin-bottom: 12px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .skill-group ul {
+      padding-left: 18px;
+      color: #bdbab2;
+      line-height: 1.75;
+    }
+
+    .skill-group li {
+      margin-bottom: 2px;
+    }
+
+    @media (max-width:560px) {
+      .skills-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .skill-group {
+        margin-bottom: 28px;
+      }
+
+      :root {
+        --radius: 130px;
+        --hole-size: 72px;
+        --hub: 150px;
+      }
+
+      .guide {
+        width: 8vw;
+      }
+
+      .panel-sheet {
+        padding: 32px 26px;
+      }
+    }
+
+    /* scroll-reveal story, six divisions below the dial */
+    .story {
+      position: relative;
+      padding: 10vh 24px 12vh;
+      z-index: 1;
+    }
+
+    .block {
+      min-height: 46vh;
+      max-width: 640px;
+      margin: 0 auto;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .block .eyebrow,
+    .block h3,
+    .block p {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 800ms cubic-bezier(.2, .8, .2, 1), transform 800ms cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .block .eyebrow {
+      font-size: 12px;
+      letter-spacing: .08em;
+      color: var(--dim);
+      margin-bottom: 14px;
+    }
+
+    .block h3 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 600;
+      margin-bottom: 16px;
+      transition-delay: 100ms;
+    }
+
+    .block p {
+      color: #bdbab2;
+      line-height: 1.7;
+      max-width: 52ch;
+      transition-delay: 220ms;
+    }
+
+    .block.visible .eyebrow,
+    .block.visible h3,
+    .block.visible p {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Nepal flag, fixed to the left, sized ~40% width / ~38% height of the page,
+     reacts to cursor position instead of scroll */
+    :root {
+      --mx: 0;
+      --my: 0;
+    }
+
+    .flagpole {
+      position: fixed;
+      left: 26px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #3a3a36;
+      z-index: 0;
+      opacity: .5;
+    }
+
+    .flag {
+      position: fixed;
+      left: 28px;
+      top: 8vh;
+      width: min(40vw, 520px);
+      aspect-ratio: 5 / 6;
+      z-index: 0;
+      opacity: .17;
+      pointer-events: auto;
+      transform-origin: 0% 15%;
+      transform: rotate(0deg) skewY(0deg) translateY(0);
+      transition: transform 450ms ease-out, opacity 300ms;
+    }
+
+    .flag:hover {
+      opacity: .25;
+      transform: rotate(calc(var(--my) * 5deg)) skewY(calc(var(--mx) * -3.5deg)) translateY(calc(var(--my) * 3vh));
+      transition: transform 260ms ease-out, opacity 300ms;
+    }
+
+    .flag .cloth {
+      position: absolute;
+      inset: 0;
+      transform-origin: 0% 15%;
+      animation: wave 4.6s ease-in-out infinite;
+    }
+
+    .flag svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    @keyframes wave {
+
+      0%,
+      100% {
+        transform: skewY(0deg) scaleX(1);
+      }
+
+      25% {
+        transform: skewY(2deg) scaleX(.99);
+      }
+
+      50% {
+        transform: skewY(0deg) scaleX(1);
+      }
+
+      75% {
+        transform: skewY(-1.6deg) scaleX(1.01);
+      }
+    }
+
+    @media (max-width:560px) {
+
+      .flagpole,
+      .flag {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="flagpole"></div>
+  <div class="flag" id="flag">
+    <div class="cloth">
+      <svg viewBox="0 0 100 120" preserveAspectRatio="xMinYMin meet" xmlns="http://www.w3.org/2000/svg" role="img"
+        aria-label="Flag of Nepal">
+        <!-- Official colors: deep blue border, crimson field, white emblems. -->
+        <!-- Simplified display geometry based on Nepal's constitutional double-pennon construction. -->
+        <polygon points="0,0 100,58 30,58 100,120 0,120" fill="#003893" />
+        <polygon points="4,6 91,58 34,58 92,114 4,114" fill="#DC143C" />
+
+        <!-- Upper pennon: crescent moon with eight visible rays. -->
+        <defs>
+          <clipPath id="nepalMoonRaysClip" clipPathUnits="userSpaceOnUse">
+            <rect x="10" y="15.5" width="40" height="18" />
+          </clipPath>
+        </defs>
+        <g transform="translate(0 8.5)">
+          <polygon
+            points="29.00,16.00 30.56,19.15 33.21,16.84 33.44,20.35 36.78,19.22 35.65,22.56 39.16,22.79 36.85,25.44 40.00,27.00 36.85,28.56 39.16,31.21 35.65,31.44 36.78,34.78 33.44,33.65 33.21,37.16 30.56,34.85 29.00,38.00 27.44,34.85 24.79,37.16 24.56,33.65 21.22,34.78 22.35,31.44 18.84,31.21 21.15,28.56 18.00,27.00 21.15,25.44 18.84,22.79 22.35,22.56 21.22,19.22 24.56,20.35 24.79,16.84 27.44,19.15"
+            fill="#FFFFFF" clip-path="url(#nepalMoonRaysClip)" />
+          <path d="M12,21 C14,33 22,41 31,42 C39,42 46,34 47,21 C43,29 38,33 32,34 C24,35 17,29 12,21 Z"
+            fill="#FFFFFF" />
+        </g>
+
+        <!-- Lower pennon: twelve-rayed sun. -->
+        <g transform="translate(0 8.5)">
+          <polygon
+            points="28,72 30.2,77.3 35,74 32.8,79.3 38.9,78.1 34.1,82 40,84 34.1,86 38.9,89.9 32.8,88.7 35,94 30.2,90.7 28,96 25.8,90.7 21,94 23.2,88.7 17.1,89.9 21.9,86 16,84 21.9,82 17.1,78.1 23.2,79.3 21,74 25.8,77.3"
+            fill="#FFFFFF" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <section class="hero" id="hero">
+    <div class="guide left"></div>
+    <div class="guide right"></div>
+
+    <div class="scene" id="scene">
+      <div class="dial-wrap">
+        <div class="outer-ring"></div>
+        <div class="dial" id="dial">
+          <button class="hole" style="--i:0" data-section="about">About</button>
+          <button class="hole" style="--i:1" data-section="projects">Projects</button>
+          <button class="hole" style="--i:2" data-section="cv">CV</button>
+          <button class="hole" style="--i:3" data-section="contact">Contact</button>
+          <div class="stopper"></div>
+        </div>
+        <div class="hub">
+          <img src="hero.jpeg" alt="Gaurav Pokhrel" style="object-position: center 90%;"
+            onload="this.nextElementSibling.style.display='none'" onerror="this.style.display='none'">
+          <div class="placeholder">your photo here</div>
+        </div>
+      </div>
+      <p class="name"><b>Gaurav Pokhrel</b> — graphic designer &amp; ui/ux designer</p>
+    </div>
+  </section>
+
+  <section class="story" id="story">
+    <div class="block"><span class="eyebrow">01</span>
+      <h3>About me</h3>
+      <p>I'm a web designer who enjoys the space between design and code sketching a layout in Figma one hour and
+        writing the CSS that makes it real the next. I care about pages that load fast, read clearly and hold up on
+        every screen size.</p>
+      <p>Over the last few years I've worked across product, e-commerce and marketing teams, helping shape design
+        systems and shipping interfaces used by millions of people.</p>
+
+
+      <div style="margin-top:2.5rem; max-width:480px">
+        <h4
+          style="font-size:15px; color:var(--dim); margin-bottom:1rem; letter-spacing:.04em; text-transform:uppercase;">
+          What I’m looking for
+        </h4>
+        <p style="color:#bdbab2; line-height:1.7; font-size:15px">
+          I enjoy roles where I get to balance visual craft with front-end problem-solving — whether that’s designing a
+          new feature, improving an existing flow, or helping an engineering team bring a design system to life.
+        </p>
+      </div>
+    </div>
+    <div class="block"><span class="eyebrow">02</span>
+      <h3>Skills & tools</h3>
+      <div class="skills-grid">
+        <div class="skills-column">
+          <div class="skill-group">
+            <h4>Design</h4>
+            <ul>
+              <li>UI/UX Design</li>
+              <li>Wireframing</li>
+              <li>Prototyping</li>
+              <li>Design Systems</li>
+              <li>Typography</li>
+              <li>Colour Theory</li>
+              <li>Figma</li>
+              <li>Adobe XD</li>
+              <li>Photoshop</li>
+              <li>Illustrator</li>
+            </ul>
+          </div>
+
+          <div class="skill-group">
+            <h4>Front-end development</h4>
+            <ul>
+              <li>HTML5</li>
+              <li>CSS3 / Sass</li>
+              <li>JavaScript (ES6+)</li>
+              <li>React</li>
+              <li>Responsive Design</li>
+              <li>Tailwind CSS</li>
+              <li>Bootstrap</li>
+              <li>GSAP & CSS Animation</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="skills-column">
+          <div class="skill-group">
+            <h4>Platforms & CMS</h4>
+            <ul>
+              <li>WordPress</li>
+              <li>Webflow</li>
+              <li>Shopify</li>
+              <li>Framer</li>
+            </ul>
+          </div>
+
+          <div class="skill-group">
+            <h4>Practice</h4>
+            <ul>
+              <li>Git & GitHub</li>
+              <li>Cross-browser Testing</li>
+              <li>Accessibility (WCAG)</li>
+              <li>SEO Fundamentals</li>
+              <li>Performance Optimisation</li>
+              <li>Agile Collaboration</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="block"><span class="eyebrow">03</span>
+      <h3>Experience</h3>
+      <p>2024 — Present
+        Senior Web Designer, Zomato
+        Leading design for consumer-facing web pages, building and maintaining the front-end design system used across
+        the marketing site.
+
+        2022 — 2024
+        Web Designer, Ola
+        Designed and coded landing pages and campaign sites, working closely with product and marketing teams to improve
+        conversion and load speed.
+
+        2021 — 2022
+        Junior Web Designer, Swiggy
+        Started out building UI components and static pages, and picked up the fundamentals of design systems and
+        responsive front-end development.
+
+      </p>
+    </div>
+    <div class="block"><span class="eyebrow">04</span>
+      <h3>Recent Projects</h3>
+      <p>
+      <ul>
+        <li>Foodline — Restaurant discovery</li>
+        <li>Northbound — Travel booking</li>
+        <li>Terra Goods — E-commerce</li>
+        <li>Ledger — SaaS landing page</li>
+      </ul>
+      </p>
+    </div>
+    <div class="block"><span class="eyebrow">05</span>
+      <h3>Let's build something good together</h3>
+      <p>Mail me at gauravpokhrel65@gmail.com or connect on <a href="https://linkedin.com/in/your-username"
+          target="_blank" style="color:var(--signal)">LinkedIn</a>. I’m always open to new collaborations and
+        interesting challenges.
+      </p>
+    </div>
+  </section>
+
+  <div class="panel" id="panel">
+    <div class="panel-sheet">
+      <button class="close" id="close" aria-label="Close">×</button>
+      <section data-section="about">
+        <h2>About</h2>
+        <div class="body">
+          <p>I’m a graphic and UI/UX designer who enjoys building clean, thoughtful interfaces and visuals.
+
+        </div>
+      </section>
+      <section data-section="projects">
+        <h2>Projects</h2>
+        <div class="body">
+          <li>Foodline — Restaurant discovery</li>
+          <li>Northbound — Travel booking</li>
+          <li>Terra Goods — E-commerce</li>
+          <li>Ledger — SaaS landing page</li>
+          </ul>
+        </div>
+      </section>
+      <section data-section="cv">
+        <h2>CV</h2>
+        <div class="body">
+          <a href="WhatsApp%20Image%202026-09-23%20at%209.34.25%20PM.jpeg" target="_blank" rel="noopener noreferrer"
+            style="display:block;">
+            <img src="WhatsApp%20Image%202026-09-23%20at%209.34.25%20PM.jpeg" alt="Gaurav Pokhrel CV"
+              style="width:100%; border-radius:8px; border:1px solid var(--line); display:block; transition:border-color 200ms, opacity 200ms;"
+              onmouseover="this.style.borderColor='var(--signal)'; this.style.opacity='.88'"
+              onmouseout="this.style.borderColor='var(--line)'; this.style.opacity='1'">
+          </a>
+          <p style="margin-top:12px; font-size:12px; color:var(--dim); text-align:center;">Click to open full size ↗</p>
+        </div>
+      </section>
+      <section data-section="contact">
+        <h2>Contact</h2>
+        <div class="body">
+          <p>gauravpokhrel65@gmail.com</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const dial = document.getElementById('dial');
+    const scene = document.getElementById('scene');
+    const panel = document.getElementById('panel');
+    const holes = [...document.querySelectorAll('.hole')];
+    const sections = [...document.querySelectorAll('.panel section')];
+    const STOPPER_ANGLE = 45; // bottom-right, matches .stopper position
+    let rotation = 0;
+    let panelTimer = null;
+
+    function angleFor(i) { return i * 90; }
+
+    function openSection(hole) {
+      const i = holes.indexOf(hole);
+      if (i < 0) return;
+
+      // Cancel any delayed panel activation from a previous click.
+      if (panelTimer) {
+        clearTimeout(panelTimer);
+        panelTimer = null;
+      }
+
+      const target = STOPPER_ANGLE - angleFor(i);
+      rotation = target;
+      dial.style.transform = `rotate(${rotation}deg)`;
+      holes.forEach(h => h.classList.toggle('selected', h === hole));
+      scene.classList.add('open');
+
+      // Always update the visible section from the button that was clicked.
+      sections.forEach(s => {
+        s.classList.toggle('current', s.dataset.section === hole.dataset.section);
+      });
+
+      panelTimer = setTimeout(() => {
+        panel.classList.add('active');
+        panelTimer = null;
+      }, 350);
+    }
+
+    function closePanel() {
+      if (panelTimer) {
+        clearTimeout(panelTimer);
+        panelTimer = null;
+      }
+
+      panel.classList.remove('active');
+      scene.classList.remove('open');
+      holes.forEach(h => h.classList.remove('selected'));
+      sections.forEach(s => s.classList.remove('current'));
+      dial.style.transform = 'rotate(0deg)';
+      rotation = 0;
+    }
+
+    holes.forEach(h => h.addEventListener('click', () => openSection(h)));
+    document.getElementById('close').addEventListener('click', closePanel);
+    panel.addEventListener('click', e => {
+      if (e.target === panel) closePanel();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+    // reveal each of the 6 sections, one by one, as it scrolls into view
+    const blocks = document.querySelectorAll('.story .block');
+    const reveal = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          reveal.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.35 });
+    blocks.forEach(b => reveal.observe(b));
+
+    // flag tilts only when cursor hovers over it
+    const root = document.documentElement;
+    const flagEl = document.getElementById('flag');
+    flagEl.addEventListener('mousemove', (e) => {
+      const rect = flagEl.getBoundingClientRect();
+      const mx = ((e.clientX - rect.left) / rect.width) * 2 - 1;   // -1 .. 1
+      const my = ((e.clientY - rect.top) / rect.height) * 2 - 1;   // -1 .. 1
+      root.style.setProperty('--mx', mx.toFixed(3));
+      root.style.setProperty('--my', my.toFixed(3));
+    }, { passive: true });
+    flagEl.addEventListener('mouseleave', () => {
+      root.style.setProperty('--mx', '0');
+      root.style.setProperty('--my', '0');
+    }, { passive: true });
+  </script>
+</body>
+
+</html>
